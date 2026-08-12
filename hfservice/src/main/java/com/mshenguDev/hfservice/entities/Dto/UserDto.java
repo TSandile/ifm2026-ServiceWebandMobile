@@ -1,30 +1,19 @@
-package com.mshenguDev.hfservice.entities;
+package com.mshenguDev.hfservice.entities.Dto;
 
-import jakarta.persistence.*;
+import com.mshenguDev.hfservice.entities.Role;
+import jakarta.persistence.Column;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-@Entity
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class UserDto {
     private String first_name;
     private String last_name;
-
-    @Column(unique = true)
     private String email;
     private String password;
     private Integer phone;
     private Role role;
     private Boolean enabled;
     private Date createdAt;
-
-    public User(){}
-
-
-
 }
