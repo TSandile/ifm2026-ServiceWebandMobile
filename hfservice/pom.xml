@@ -28,6 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>25</java.version>
+
 	</properties>
 	<dependencies>
 		<dependency>
@@ -84,6 +85,14 @@
 			<artifactId>testcontainers-mysql</artifactId>
 			<scope>test</scope>
 		</dependency>
+<!--		add lombok dependency for boilerplate code-->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.46</version>
+
+		</dependency>
+
 	</dependencies>
 
 	<build>
