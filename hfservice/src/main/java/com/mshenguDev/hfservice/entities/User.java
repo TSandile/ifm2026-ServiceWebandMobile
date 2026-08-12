@@ -1,11 +1,15 @@
 package com.mshenguDev.hfservice.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class User {
 
@@ -23,7 +27,7 @@ public class User {
     private Boolean enabled;
     private Date createdAt;
 
-    public User(){}
+
 
 
 

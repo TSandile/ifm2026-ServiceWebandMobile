@@ -2,11 +2,17 @@ package com.mshenguDev.hfservice.entities.Dto;
 
 import com.mshenguDev.hfservice.entities.Role;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
 public class UserDto {
     private String first_name;
     private String last_name;
