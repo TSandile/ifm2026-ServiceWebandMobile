@@ -12,12 +12,11 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     @PostMapping(path = "/addUser")
-    public ResponseEntity<?> addUser(@RequestBody UserDto userDto) throws Exception{
+    public ResponseEntity<?> addUser(@RequestBody UserDto userDto){
         if(userDto == null){
-            throw new NullPointerException("User attributes are empty");
+            throw new NullPointerException("Entify fields are empty");
         }
-
-        return ResponseEntity.ok("User created Successfully" );
+        return ResponseEntity.ok("New user Added");
     }
 
     @GetMapping(path = "/getAllUsers")
