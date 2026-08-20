@@ -4,28 +4,27 @@ import com.mshenguDev.hfservice.entities.Dto.UserDto;
 import com.mshenguDev.hfservice.entities.User;
 import com.mshenguDev.hfservice.repositories.UserRepository;
 import com.mshenguDev.hfservice.services.UserService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
+@Service
 public class UserServiceImpl implements UserService {
-    private final UserService userService;
     private final UserRepository userRepository;
+
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public String registerUser(UserDto newUserDto) {
-        if (newUserDto.getFirst_name().isBlank() && newUserDto.getFirst_name().isBlank()) {
+        if (newUserDto == null || newUserDto.getFirst_name() == null || newUserDto.getFirst_name().isBlank() ||
+                newUserDto.getLast_name() == null || newUserDto.getLast_name().isBlank()) {
             throw new NullPointerException("Entity fields are empty");
         }
         try {
-            User newUser = new User();
-            newUser.setFirst_name(newUserDto.getFirst_name());
-            newUser.setLast_name(newUserDto.getLast_name());
-            newUser.setEmail(newUserDto.getEmail());
-            newUser.setPassword(newUserDto.getPassword());
-            newUser.setPhone(newUserDto.getPhone());
+            User newUser = new User(newUserDto.getFirst_name(), newUserDto.getLast_name(), newUserDto.getEmail(), newUserDto.getPassword(), newUserDto.getPhone());
             userRepository.save(newUser);
         } catch (Exception e) {
             throw new RuntimeException("Error while registering user: " + e.getMessage());
@@ -49,6 +48,3 @@ public class UserServiceImpl implements UserService {
     }
 
 }
-
-
-
