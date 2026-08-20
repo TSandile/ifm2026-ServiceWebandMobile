@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 @Entity
 public class Component {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private Long id;
     private String type;
     private String description;
