@@ -153,8 +153,8 @@ export function Home() {
         {!supabase ? (
           <div className="rounded-xl border border-dashed border-border py-20 text-center">
             <p className="text-muted-foreground">
-              Supabase is not configured yet. Add VITE_SUPABASE_URL and
-              VITE_SUPABASE_ANON_KEY to enable the catalog.
+              {/* Supabase is not configured yet. Add VITE_SUPABASE_URL and
+              VITE_SUPABASE_ANON_KEY to enable the catalog. */}
             </p>
           </div>
         ) : loading ? (

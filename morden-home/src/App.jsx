@@ -3,6 +3,7 @@
 import { Route, Routes } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { Home } from "./pages/Home";
+import { Register } from "./pages/Register";
 
 function NotFound() {
   return (
@@ -22,10 +23,10 @@ function App() {
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
-          {/* <Route path="/furniture/:id" element={<FurnitureDetail />} />
-          <Route path="/login" element={<Login />} />
+          {/* <Route path="/furniture/:id" element={<FurnitureDetail />} /> */}
+          {/* <Route path="/login" element={<Login />} /> */}
           <Route path="/register" element={<Register />} />
-          <Route
+          {/* <Route
             path="/admin"
             element={
               <RequireAdmin>
