@@ -56,6 +56,18 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
+    public String update(Long id, ComponentDto componentDto) {
+        Component component = componentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Component not found"));
+        component.setType(componentDto.getType());
+        component.setDescription(componentDto.getDescription());
+        component.setPrice(componentDto.getPrice());
+        componentRepository.save(component);
+
+        return "SUCCESS";
+    }
+
+    @Override
     public String uploadImage(Long id, MultipartFile image) throws IOException {
         if (image == null || image.isEmpty()) {
             throw new IllegalArgumentException("Image file is empty");

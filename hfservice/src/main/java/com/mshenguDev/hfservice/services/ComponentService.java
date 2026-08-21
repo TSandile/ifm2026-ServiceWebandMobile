@@ -13,6 +13,6 @@ public interface ComponentService{
     Optional<Component> retrieveComponentByType(String type);
     List<Component> retrieveAllComponents();
     Long removeComponentById(Long id);
-
+    String update(Long id, ComponentDto componentDto);
     String uploadImage(Long id, MultipartFile image) throws java.io.IOException;
 }

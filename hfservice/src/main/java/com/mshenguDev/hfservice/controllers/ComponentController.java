@@ -48,6 +48,15 @@ public class ComponentController {
         }
     }
 
+    @PutMapping("/updateComponent/{id}")
+    public ResponseEntity<?> updateComponent(@PathVariable Long id, @RequestBody ComponentDto componentDto) {
+        String response = componentService.update(id, componentDto);
+        if (!"SUCCESS".equals(response)) {
+            return ResponseEntity.badRequest().body(response);
+        }
+        return ResponseEntity.ok("Component updated successfully");
+    }
+
     @GetMapping("/getAllComponents")
     public ResponseEntity<List<Component>> getAllComponents(){
         List<Component> components = componentService.retrieveAllComponents();
