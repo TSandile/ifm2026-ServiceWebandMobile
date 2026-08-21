@@ -13,7 +13,7 @@ public class Component {
 
     private Integer stock_level = 0;
     @Lob
-    @Column(name ="image")
+    @Column(name ="image", columnDefinition = "LONGBLOB")
     private byte[] image;
 
     public Component(){}
@@ -24,6 +24,15 @@ public class Component {
         this.price = price;
         this.stock_level = 1;
         this.image = image;
+
+    }
+
+    public Component(String type, String description, Double price) {
+        this.type = type;
+        this.description = description;
+        this.price = price;
+        this.stock_level = 1;
+        this.image = null;
     }
 
     public Long getId(){return id;}
