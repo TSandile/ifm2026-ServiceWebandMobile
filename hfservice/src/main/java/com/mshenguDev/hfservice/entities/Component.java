@@ -7,9 +7,15 @@ public class Component {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
-    private String type;
     private String description;
     private Double price;
+
+    @Enumerated(EnumType.STRING)
+    private ComponentType type;
+
+    @Enumerated(EnumType.STRING)
+    private Material material;
+
 
     private Integer stock_level = 0;
     @Lob
@@ -18,8 +24,8 @@ public class Component {
 
     public Component(){}
 
-    public Component(String type, String description, Double price, byte[] image) {
-        this.type = type;
+    public Component( String description, Double price, byte[] image) {
+        this.type = null;
         this.description = description;
         this.price = price;
         this.stock_level = 1;
@@ -27,8 +33,8 @@ public class Component {
 
     }
 
-    public Component(String type, String description, Double price) {
-        this.type = type;
+    public Component( String description, Double price) {
+        this.type = null;
         this.description = description;
         this.price = price;
         this.stock_level = 1;
@@ -36,13 +42,13 @@ public class Component {
     }
 
     public Long getId(){return id;}
-    public String getType(){return type;}
+    public ComponentType getType(){return type;}
     public String getDescription(){return description;}
     public Double getPrice(){return price;}
     public Integer getStock_level(){return stock_level;}
     public byte[] getImage(){return image;}
 
-    public void setType(String type) {
+    public void setType(ComponentType type) {
         this.type = type;
     }
     public void setDescription(String description){
