@@ -74,4 +74,20 @@ public class ComponentController {
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(component.getImage());
     }
+
+    @GetMapping("/getComponent/{id}")
+    public ResponseEntity<Component> getSingleComponent(@RequestParam Long id){
+        Component component = componentService.retrieveComponentById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Component not found"));
+        return ResponseEntity.ok(component);
+    }
+
+    @DeleteMapping("/deleteComponent/{id}")
+    public ResponseEntity<?> deleteComponentById(@PathVariable Long id){
+        Long deletedId = componentService.removeComponentById(id);
+        if(deletedId == null){
+            return ResponseEntity.status(500).body("Failed to delete component");
+        }
+        return ResponseEntity.ok("Component deleted successfully");
+    }
 }

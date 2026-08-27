@@ -1,9 +1,11 @@
 package com.mshenguDev.hfservice.services.impl;
 
 import com.mshenguDev.hfservice.entities.Dto.UserDto;
+import com.mshenguDev.hfservice.entities.Role;
 import com.mshenguDev.hfservice.entities.User;
 import com.mshenguDev.hfservice.repositories.UserRepository;
 import com.mshenguDev.hfservice.services.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,19 +14,29 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public String registerUser(UserDto newUserDto) {
-        if (newUserDto == null || newUserDto.getFirst_name() == null || newUserDto.getFirst_name().isBlank() ||
-                newUserDto.getLast_name() == null || newUserDto.getLast_name().isBlank()) {
+        if (newUserDto == null || newUserDto.getFirst_name() == null || newUserDto.getFirst_name().isEmpty() ||
+                newUserDto.getLast_name() == null || newUserDto.getLast_name().isEmpty()) {
             throw new NullPointerException("Entity fields are empty");
         }
         try {
-            User newUser = new User(newUserDto.getFirst_name(), newUserDto.getLast_name(), newUserDto.getEmail(), newUserDto.getPassword(), newUserDto.getPhone());
+            User newUser = new User();
+            newUser.setFirst_name(newUserDto.getFirst_name());
+            newUser.setLast_name(newUserDto.getLast_name());
+            newUser.setEmail(newUserDto.getEmail());
+            String newPassword = passwordEncoder.encode(newUserDto.getPassword());
+            newUser.setPassword(newPassword);
+            newUser.setPhone(newUserDto.getPhone());
+            newUser.setAddress(newUserDto.getAddress());
+            newUser.setRole(Role.CUSTOMER);
             userRepository.save(newUser);
         } catch (Exception e) {
             throw new RuntimeException("Error while registering user: " + e.getMessage());

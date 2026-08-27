@@ -18,6 +18,7 @@ public class UserDto {
     private String email;
     private String password;
     private String phone;
+    private String address;
 //    private Role role;
 //    private Boolean enabled;
 //    private Date createdAt;
@@ -27,6 +28,7 @@ public class UserDto {
     public String getEmail(){return email;}
     public String getPassword(){return password;}
     public String getPhone(){return phone;}
+    public String getAddress(){return address;}
 //    public Role getRole(){return role;}
 //    public Boolean getEnabled(){return enabled;}
 //    public Date getCtreatedAt(){return createdAt;}

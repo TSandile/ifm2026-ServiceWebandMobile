@@ -17,7 +17,7 @@ import java.util.Optional;
 //@RequestMapping(path = "/api/v0.1/users")
 @RequestMapping(path = "/api/users")
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
     public UserController(UserService userService){
         this.userService = userService;
     }
@@ -35,4 +35,10 @@ public class UserController {
     public ResponseEntity<List<User>> getUsers(){
         return  ResponseEntity.ok(userService.retrieveAllUsers());
     }
+
+    @GetMapping(path = "/getUserById/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long id){
+        return ResponseEntity.ok(userService.retrieveUserById(id).orElseThrow(() -> new RuntimeException("User not found")));
+    }
+
 }

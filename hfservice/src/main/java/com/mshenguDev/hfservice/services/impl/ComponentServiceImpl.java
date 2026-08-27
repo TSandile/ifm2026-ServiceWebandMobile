@@ -1,7 +1,9 @@
 package com.mshenguDev.hfservice.services.impl;
 
 import com.mshenguDev.hfservice.entities.Component;
+import com.mshenguDev.hfservice.entities.ComponentType;
 import com.mshenguDev.hfservice.entities.Dto.ComponentDto;
+import com.mshenguDev.hfservice.entities.Material;
 import com.mshenguDev.hfservice.repositories.ComponentRepository;
 import com.mshenguDev.hfservice.services.ComponentService;
 import org.springframework.stereotype.Service;
@@ -21,10 +23,44 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public String addComponent(ComponentDto componentDto) {
-        if(componentDto.getType().isBlank() || componentDto.getDescription().isBlank() || componentDto.getPrice() == null){
+        if( componentDto.getDescription().isBlank() || componentDto.getPrice() == null){
             throw new NullPointerException("Entity fields are empty");
         }
-        Component newComponent = new Component(componentDto.getType(), componentDto.getDescription(), componentDto.getPrice());
+        Component newComponent = new Component(componentDto.getDescription(), componentDto.getPrice());
+        if(componentDto.getDescription().toUpperCase().contains("TABLE")){
+            if(componentDto.getDescription().toUpperCase().contains("LEG")){
+                newComponent.setType(ComponentType.TABLE_LEG);
+                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
+                    newComponent.setMaterial(Material.WOOD);
+                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
+                    newComponent.setMaterial(Material.STEEL);
+                }
+            } else if (componentDto.getDescription().toUpperCase().contains("TOP")) {
+                newComponent.setType(ComponentType.TABLE_TOP);
+                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
+                    newComponent.setMaterial(Material.WOOD);
+                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
+                    newComponent.setMaterial(Material.STEEL);
+                }
+            }
+
+        }else if(componentDto.getDescription().toUpperCase().contains("CHAIR")){{
+            if(componentDto.getDescription().toUpperCase().contains("SEAT")){
+                newComponent.setType(ComponentType.CHAIR_SEAT);
+                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
+                    newComponent.setMaterial(Material.WOOD);
+                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
+                    newComponent.setMaterial(Material.STEEL);
+                }
+            }else if(componentDto.getDescription().toUpperCase().contains("LEG")){
+                newComponent.setType(ComponentType.CHAIR_LEG);
+                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
+                    newComponent.setMaterial(Material.WOOD);
+                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
+                    newComponent.setMaterial(Material.STEEL);
+                }
+            }
+        }}
         componentRepository.save(newComponent);
         return "SUCCESS";
     }
@@ -59,7 +95,7 @@ public class ComponentServiceImpl implements ComponentService {
     public String update(Long id, ComponentDto componentDto) {
         Component component = componentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Component not found"));
-        component.setType(componentDto.getType());
+       // component.setType(componentDto.getType());
         component.setDescription(componentDto.getDescription());
         component.setPrice(componentDto.getPrice());
         componentRepository.save(component);

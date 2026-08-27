@@ -17,7 +17,7 @@ public class Component {
     private Material material;
 
 
-    private Integer stock_level = 0;
+    public static Integer stock_level = 0;
     @Lob
     @Column(name ="image", columnDefinition = "LONGBLOB")
     private byte[] image;
@@ -28,7 +28,7 @@ public class Component {
         this.type = null;
         this.description = description;
         this.price = price;
-        this.stock_level = 1;
+        stock_level += 1;
         this.image = image;
 
     }
@@ -37,12 +37,13 @@ public class Component {
         this.type = null;
         this.description = description;
         this.price = price;
-        this.stock_level = 1;
+        stock_level += 1;
         this.image = null;
     }
 
     public Long getId(){return id;}
     public ComponentType getType(){return type;}
+    public Material getMaterial(){return material;}
     public String getDescription(){return description;}
     public Double getPrice(){return price;}
     public Integer getStock_level(){return stock_level;}
@@ -51,6 +52,11 @@ public class Component {
     public void setType(ComponentType type) {
         this.type = type;
     }
+
+    public void setMaterial(Material material){
+        this.material = material;
+    }
+
     public void setDescription(String description){
         this.description = description;
     }
