@@ -1,13 +1,40 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { supabase } from "../lib/supabase";
+import { getComponentImageUrl } from "../lib/utils";
+
+const COMPONENTS_ENDPOINT =
+  import.meta.env.VITE_API_COMPONENTS_URL ??
+  "http://localhost:8080/api/components/getAllComponents";
+
+function getComponents(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.components)) return payload.components;
+  return [];
+}
 
 function FurnitureCard({ item }) {
-  const image = item.image_url || "/hero-furniture.png";
+  const image = getComponentImageUrl(item);
 
   return (
     <article className="overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
-      <img src={image} alt={item.name} className="h-56 w-full object-cover" />
+      {image ? (
+        <img
+          src={image}
+          alt={item.name}
+          className="h-56 w-full object-cover"
+          crossOrigin="anonymous"
+          onError={(event) => {
+            event.currentTarget.src = "/hero-furniture.png";
+          }}
+        />
+      ) : (
+        <img
+          src="/hero-furniture.png"
+          alt={item.name}
+          className="h-56 w-full object-cover"
+        />
+      )}
       <div className="p-4">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -44,39 +71,41 @@ function FurnitureCard({ item }) {
 export function Home() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
 
   useEffect(() => {
-    async function fetchFurniture() {
-      if (!supabase) {
-        setItems([]);
-        setLoading(false);
-        return;
-      }
+    const controller = new AbortController();
 
+    async function fetchComponents() {
+      setLoading(true);
+      setError("");
       try {
-        const { data, error } = await supabase
-          .from("furniture")
-          .select("*")
-          .order("created_at", { ascending: false });
+        const response = await fetch(COMPONENTS_ENDPOINT, {
+          signal: controller.signal,
+          headers: { Accept: "application/json" },
+        });
 
-        if (error) {
-          console.error("Supabase fetch error:", error);
-          setItems([]);
-          setLoading(false);
-          return;
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
         }
 
-        setItems(data || []);
+        const payload = await response.json();
+        setItems(getComponents(payload));
       } catch (err) {
-        console.error("Failed to load furniture:", err);
-        setItems([]);
+        if (err.name !== "AbortError") {
+          console.error("Failed to load components:", err);
+          setItems([]);
+          setError("We could not load the components. Please try again.");
+        }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }
 
-    fetchFurniture();
+    fetchComponents();
+
+    return () => controller.abort();
   }, []);
 
   const categories = useMemo(() => {
@@ -150,14 +179,7 @@ export function Home() {
           </div>
         </div>
 
-        {!supabase ? (
-          <div className="rounded-xl border border-dashed border-border py-20 text-center">
-            <p className="text-muted-foreground">
-              {/* Supabase is not configured yet. Add VITE_SUPABASE_URL and
-              VITE_SUPABASE_ANON_KEY to enable the catalog. */}
-            </p>
-          </div>
-        ) : loading ? (
+        {loading ? (
           <div className="grid gap-6 py-12 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="animate-pulse">
@@ -166,6 +188,17 @@ export function Home() {
                 <div className="mt-2 h-4 w-1/3 rounded bg-muted" />
               </div>
             ))}
+          </div>
+        ) : error ? (
+          <div className="rounded-xl border border-dashed border-border py-20 text-center">
+            <p className="text-muted-foreground">{error}</p>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="mt-4 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+            >
+              Try again
+            </button>
           </div>
         ) : filtered.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border py-20 text-center">
