@@ -1,10 +1,29 @@
 // import "./App.css";
 
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { Navbar } from "./components/Navbar";
 import { Home } from "./pages/Home";
 import { FurnitureDetail } from "./pages/FurnitureDetail";
 import { Register } from "./pages/Register";
+import { Login } from "./pages/Login";
+import { Admin } from "./pages/Admin";
+import { useAuth } from "./context/AuthContext.js";
+
+function RequireAdmin({ children }) {
+  const { user, isAdmin, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center text-muted-foreground">
+        Loading your account...
+      </div>
+    );
+  }
+  if (!user) return <Navigate to="/login" replace />;
+  if (!isAdmin) return <Navigate to="/" replace />;
+
+  return children;
+}
 
 function NotFound() {
   return (
@@ -25,16 +44,16 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/furniture/:id" element={<FurnitureDetail />} />
-          {/* <Route path="/login" element={<Login />} /> */}
+          <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          {/* <Route
+          <Route
             path="/admin"
             element={
               <RequireAdmin>
                 <Admin />
               </RequireAdmin>
             }
-          /> */}
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

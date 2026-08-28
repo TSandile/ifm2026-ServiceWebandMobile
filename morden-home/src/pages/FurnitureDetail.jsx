@@ -107,7 +107,7 @@ export function FurnitureDetail() {
           {getComponentImageUrl(item) ? (
             <img
               src={getComponentImageUrl(item)}
-              alt={item.name}
+              alt={`Component ${item.id}`}
               className="h-full w-full object-cover"
               crossOrigin="anonymous"
               onError={(event) => {
@@ -127,7 +127,7 @@ export function FurnitureDetail() {
           </span>
 
           <h1 className="mt-1 font-display text-3xl font-semibold text-foreground">
-            {item.name}
+            Component #{item.id}
           </h1>
 
           <p className="mt-3 text-2xl font-semibold text-foreground">
@@ -170,7 +170,7 @@ export function FurnitureDetail() {
         </div>
 
         <p className="mt-1 text-sm text-muted-foreground">
-          Components our studio recommends combining with the {item.name}.
+          Components our studio recommends combining with Component #{item.id}.
         </p>
 
         {compatible.length === 0 ? (

@@ -1,11 +1,25 @@
-import { createContext, useContext, useEffect, useState } from "react";
-// import { supabase } from "@/lib/supabase";
-import { supabase } from "../lib/supabase";
+import { useEffect, useState } from "react";
 
-const AuthContext = createContext(undefined);
+import { supabase } from "../lib/supabase";
+import { AuthContext } from "./AuthContext.js";
+
+function hasAdminRole(user) {
+  return Boolean(
+    user?.is_admin ||
+    user?.isAdmin ||
+    ["admin", "role_admin"].includes(String(user?.role || "").toLowerCase()),
+  );
+}
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
+  const [apiUser, setApiUser] = useState(() => {
+    try {
+      return JSON.parse(sessionStorage.getItem("morden-api-user")) || null;
+    } catch {
+      return null;
+    }
+  });
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -98,74 +112,80 @@ export function AuthProvider({ children }) {
   }
 
   async function signIn(email, password) {
-    if (!supabase) {
+    try {
+      const response = await fetch("http://localhost:8081/api/users/login", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const responseBody = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        return {
+          error:
+            responseBody?.message ||
+            responseBody?.error ||
+            `Sign in failed with status ${response.status}`,
+        };
+      }
+
+      const loggedInUser =
+        responseBody?.user ||
+        responseBody?.data?.user ||
+        responseBody?.data ||
+        responseBody;
+
+      const user =
+        loggedInUser && typeof loggedInUser === "object"
+          ? loggedInUser
+          : { email };
+
+      setApiUser(user);
+      sessionStorage.setItem("morden-api-user", JSON.stringify(user));
+
       return {
-        error:
-          "Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.",
+        error: null,
+        data: responseBody,
+        isAdmin: hasAdminRole(loggedInUser),
+      };
+    } catch (err) {
+      console.error("Sign in request failed:", err);
+      return {
+        error: "Unable to connect to the sign in service. Please try again.",
       };
     }
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      if (error.message.toLowerCase().includes("email not confirmed")) {
-        return {
-          error: "Please confirm your email address before signing in.",
-        };
-      }
-
-      if (error.status === 429) {
-        return {
-          error: "Too many attempts. Please wait a moment and try again.",
-        };
-      }
-
-      if (error.message.toLowerCase().includes("invalid login")) {
-        return {
-          error: "Invalid email or password.",
-        };
-      }
-
-      return {
-        error: error.message,
-      };
-    }
-
-    return {
-      error: null,
-    };
   }
 
   async function signOut() {
-    if (!supabase) return;
+    setApiUser(null);
+    sessionStorage.removeItem("morden-api-user");
 
-    await supabase.auth.signOut();
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
+
+    setSession(null);
     setProfile(null);
   }
 
   const value = {
     session,
-    user: session?.user || null,
+    user: session?.user || apiUser,
     profile,
     loading,
-    isAdmin: profile?.is_admin || false,
+    isAdmin:
+      profile?.is_admin ||
+      apiUser?.is_admin ||
+      apiUser?.isAdmin ||
+      hasAdminRole(apiUser),
     signUp,
     signIn,
     signOut,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-
-  if (!ctx) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-
-  return ctx;
 }

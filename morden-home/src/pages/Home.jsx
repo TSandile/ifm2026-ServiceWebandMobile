@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { getComponentImageUrl } from "../lib/utils";
+import { Link } from "react-router-dom";
+import { formatPrice, getComponentImageUrl } from "../lib/utils";
+import { useAuth } from "../context/AuthContext.js";
 
 const COMPONENTS_ENDPOINT =
   import.meta.env.VITE_API_COMPONENTS_URL ??
-  "http://localhost:8080/api/components/getAllComponents";
+  "http://localhost:8081/api/components/getAllComponents";
 
 function getComponents(payload) {
   if (Array.isArray(payload)) return payload;
@@ -15,13 +17,14 @@ function getComponents(payload) {
 
 function FurnitureCard({ item }) {
   const image = getComponentImageUrl(item);
+  const { isAdmin } = useAuth();
 
   return (
     <article className="overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
       {image ? (
         <img
           src={image}
-          alt={item.name}
+          alt={`Component ${item.id}`}
           className="h-56 w-full object-cover"
           crossOrigin="anonymous"
           onError={(event) => {
@@ -31,7 +34,7 @@ function FurnitureCard({ item }) {
       ) : (
         <img
           src="/hero-furniture.png"
-          alt={item.name}
+          alt={`Component ${item.id}`}
           className="h-56 w-full object-cover"
         />
       )}
@@ -42,15 +45,11 @@ function FurnitureCard({ item }) {
               {item.category}
             </p>
             <h3 className="mt-2 text-xl font-semibold text-foreground">
-              {item.name}
+              Component #{item.id}
             </h3>
           </div>
           <span className="rounded-full bg-primary/10 px-2 py-1 text-sm font-medium text-primary">
-            {new Intl.NumberFormat("en-US", {
-              style: "currency",
-              currency: "USD",
-              maximumFractionDigits: 0,
-            }).format(item.price)}
+            {formatPrice(item.price)}
           </span>
         </div>
 
@@ -64,6 +63,16 @@ function FurnitureCard({ item }) {
           <span>{item.dimensions || "Custom sizing"}</span>
         </div>
       </div>
+
+      {isAdmin && (
+        <Link
+          to={`/admin?componentId=${encodeURIComponent(item.id)}`}
+          state={{ component: item }}
+          className="mx-4 mb-4 rounded-lg border border-primary px-3 py-2 text-center text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground"
+        >
+          Manage component
+        </Link>
+      )}
     </article>
   );
 }

@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { CheckCircle2 } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
 
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/field";
-// import { Button } from "@/components/ui/button"
-// import { Input } from "@/components/ui/input"
-// import { Label } from "@/components/ui/field"
+
+const REGISTER_ENDPOINT =
+  import.meta.env.VITE_REGISTER_API_URL ??
+  "http://localhost:8081/api/users/addUser";
 
 export function Register() {
-  const { signUp } = useAuth();
   const navigate = useNavigate();
 
   const [firstName, setFirstName] = useState("");
@@ -19,9 +17,9 @@ export function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [confirmSent, setConfirmSent] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -33,48 +31,40 @@ export function Register() {
     }
 
     setSubmitting(true);
-    const { error, needsConfirmation } = await signUp(
-      email,
-      password,
-      fullName,
-    );
-    setSubmitting(false);
+    try {
+      const response = await fetch(REGISTER_ENDPOINT, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          first_name: firstName,
+          last_name: lastName,
+          email,
+          password,
+          phone,
+          address,
+        }),
+      });
 
-    if (error) {
-      setError(error);
-      return;
+      const responseBody = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(
+          responseBody?.message ||
+            responseBody?.error ||
+            `Registration failed with status ${response.status}`,
+        );
+      }
+
+      navigate("/", { replace: true });
+    } catch (err) {
+      console.error("Registration failed:", err);
+      setError(err.message || "Registration failed. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
-
-    if (needsConfirmation) {
-      setConfirmSent(true);
-      return;
-    }
-
-    navigate("/", { replace: true });
-  }
-
-  if (confirmSent) {
-    return (
-      <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-4 py-12">
-        <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
-          <CheckCircle2 className="mx-auto h-12 w-12 text-primary" />
-
-          <h1 className="mt-4 font-display text-2xl font-semibold text-card-foreground">
-            Check your inbox
-          </h1>
-
-          <p className="mt-2 text-sm text-muted-foreground">
-            We sent a confirmation link to{" "}
-            <span className="font-medium text-foreground">{email}</span>.
-            Confirm your email, then sign in.
-          </p>
-
-          <Link to="/login" className="mt-6 inline-block">
-            <Button size="lg">Go to sign in</Button>
-          </Link>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -85,12 +75,12 @@ export function Register() {
         </h1>
 
         <p className="mt-1 text-sm text-muted-foreground">
-          Join Morden Home furn family.
+          Join Morden Home furniture family.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <div>
-            <Label htmlFor="fullName">First Name</Label>
+            <Label htmlFor="firstName">First Name</Label>
 
             <Input
               id="firstName"
@@ -104,10 +94,10 @@ export function Register() {
           </div>
 
           <div>
-            <Label htmlFor="fullName">Last Name</Label>
+            <Label htmlFor="lastName">Last Name</Label>
 
             <Input
-              id="LASTName"
+              id="lastName"
               type="text"
               autoComplete="name"
               required
@@ -146,7 +136,7 @@ export function Register() {
           </div>
 
           <div>
-            <Label htmlFor="fullName">Phone +27</Label>
+            <Label htmlFor="phone">Phone +27</Label>
 
             <Input
               id="phone"
@@ -156,6 +146,20 @@ export function Register() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="012 345 6789"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="address">Address</Label>
+
+            <Input
+              id="address"
+              type="text"
+              autoComplete="address"
+              required
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="00  Street Name"
             />
           </div>
 

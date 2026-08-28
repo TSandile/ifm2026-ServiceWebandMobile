@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { LayoutGrid, LogOut, Shield, Sofa } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext.js";
 
 function Button({
   children,
