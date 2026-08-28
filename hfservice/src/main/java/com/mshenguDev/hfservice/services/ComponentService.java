@@ -15,4 +15,5 @@ public interface ComponentService{
     Long removeComponentById(Long id);
     String update(Long id, ComponentDto componentDto);
     String uploadImage(Long id, MultipartFile image) throws java.io.IOException;
+    String registerComponent(ComponentDto componentDto, MultipartFile image) throws java.io.IOException;
 }

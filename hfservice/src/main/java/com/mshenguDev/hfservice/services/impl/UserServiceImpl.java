@@ -1,5 +1,6 @@
 package com.mshenguDev.hfservice.services.impl;
 
+import com.mshenguDev.hfservice.entities.Dto.LoginDto;
 import com.mshenguDev.hfservice.entities.Dto.UserDto;
 import com.mshenguDev.hfservice.entities.Role;
 import com.mshenguDev.hfservice.entities.User;
@@ -45,6 +46,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User login(LoginDto logDetails) {
+        Optional<User> user = userRepository.getByEmail(logDetails.getEmail());
+        if (user.isPresent() && passwordEncoder.matches(logDetails.getPassword(), user.get().getPassword())) {
+            return user.get();
+        }
+        throw new RuntimeException("Invalid credentials");
+    }
+
+    @Override
     public Optional<User> retrieveUserById(Long id) {
         return userRepository.findById(id);
     }
@@ -57,6 +67,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> retrieveAllUsers() {
         return userRepository.findAll();
+    }
+
+    @Override
+    public String removeUser(Long id) {
+        userRepository.deleteById(id);
+        return "User removed";
     }
 
 }

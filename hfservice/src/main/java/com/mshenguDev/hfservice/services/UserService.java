@@ -1,5 +1,6 @@
 package com.mshenguDev.hfservice.services;
 
+import com.mshenguDev.hfservice.entities.Dto.LoginDto;
 import com.mshenguDev.hfservice.entities.Dto.UserDto;
 import com.mshenguDev.hfservice.entities.User;
 import java.util.List;
@@ -10,5 +11,7 @@ public interface UserService {
      Optional<User> retrieveUserById(Long id);
      Optional<User> retrieveUserByEmail(String email);
      List<User> retrieveAllUsers();
+     String removeUser(Long id);
+     User login(LoginDto logDetails);
 
 }

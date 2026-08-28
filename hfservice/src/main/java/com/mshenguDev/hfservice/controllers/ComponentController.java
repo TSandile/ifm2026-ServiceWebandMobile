@@ -31,6 +31,24 @@ public class ComponentController {
         return ResponseEntity.ok("Component added successfully");
     }
 
+    @PostMapping("/registerComponent")
+    public ResponseEntity<?> registerComponent(@RequestParam("description") String description, @RequestParam("price") Double price, @RequestParam("image") MultipartFile image) {
+        ComponentDto componentDto = new ComponentDto(description, price);
+        if (image == null || image.isEmpty()) {
+            return ResponseEntity.badRequest().body("Image file is required");
+        }
+
+        try {
+            String response = componentService.registerComponent(componentDto, image);
+            if (!"SUCCESS".equals(response)) {
+                return ResponseEntity.badRequest().body(response);
+            }
+            return ResponseEntity.ok("Component registered successfully");
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Unable to register component: " + e.getMessage());
+        }
+    }
+
     @PostMapping( "/uploadImage" )
     public ResponseEntity<?> uploadImage(@RequestParam("id") Long id, @RequestParam("image") MultipartFile image) {
         if (image == null || image.isEmpty()) {
@@ -76,7 +94,7 @@ public class ComponentController {
     }
 
     @GetMapping("/getComponent/{id}")
-    public ResponseEntity<Component> getSingleComponent(@RequestParam Long id){
+    public ResponseEntity<Component> getSingleComponent(@PathVariable Long id){
         Component component = componentService.retrieveComponentById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Component not found"));
         return ResponseEntity.ok(component);

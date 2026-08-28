@@ -66,6 +66,62 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
+    public String registerComponent(ComponentDto componentDto , MultipartFile image) throws IOException{
+        if( componentDto.getDescription().isBlank() || componentDto.getPrice() == null){
+            throw new NullPointerException("Entity fields are empty");
+        }
+        Component newComponent = new Component(componentDto.getDescription(), componentDto.getPrice());
+        if(componentDto.getDescription().toUpperCase().contains("TABLE")){
+            if(componentDto.getDescription().toUpperCase().contains("LEG")){
+                newComponent.setType(ComponentType.TABLE_LEG);
+                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
+                    newComponent.setMaterial(Material.WOOD);
+                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
+                    newComponent.setMaterial(Material.STEEL);
+                }
+            } else if (componentDto.getDescription().toUpperCase().contains("TOP")) {
+                newComponent.setType(ComponentType.TABLE_TOP);
+                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
+                    newComponent.setMaterial(Material.WOOD);
+                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
+                    newComponent.setMaterial(Material.STEEL);
+                }
+            }
+
+        }else if(componentDto.getDescription().toUpperCase().contains("CHAIR")){{
+            if(componentDto.getDescription().toUpperCase().contains("SEAT")){
+                newComponent.setType(ComponentType.CHAIR_SEAT);
+                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
+                    newComponent.setMaterial(Material.WOOD);
+                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
+                    newComponent.setMaterial(Material.STEEL);
+                }
+            }else if(componentDto.getDescription().toUpperCase().contains("LEG")){
+                newComponent.setType(ComponentType.CHAIR_LEG);
+                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
+                    newComponent.setMaterial(Material.WOOD);
+                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
+                    newComponent.setMaterial(Material.STEEL);
+                }
+            }
+        }}
+        if (image == null || image.isEmpty()) {
+            throw new IllegalArgumentException("Image file is empty");
+        }
+
+        if (image.getSize() > 5L * 1024 * 1024) {
+            throw new IllegalArgumentException("Image file is too large. Max size is 5MB");
+        }
+
+        if (image.getContentType() == null || !image.getContentType().startsWith("image/")) {
+            throw new IllegalArgumentException("Only image files are allowed");
+        }
+        newComponent.setImage(image.getBytes());
+        componentRepository.save(newComponent);
+        return "SUCCESS";
+    }
+
+    @Override
     public Optional<Component> retrieveComponentById(Long id) {
         return componentRepository.findById(id);
     }
