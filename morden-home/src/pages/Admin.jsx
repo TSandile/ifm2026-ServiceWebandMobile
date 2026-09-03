@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Boxes, Link2 } from "lucide-react";
+import { Boxes } from "lucide-react";
 import { useAuth } from "../context/AuthContext.js";
 import { FurnitureManager } from "../components/admin/FurnitureManager";
 import { CompatibilityManager } from "../components/admin/CompatibilityManager";
@@ -15,7 +15,7 @@ export function Admin() {
 
   const tabs = [
     { key: "components", label: "Components", icon: Boxes },
-    { key: "compatibility", label: "Compatibility", icon: Link2 },
+    // { key: "compatibility", label: "Compatibility", icon: Link2 },
   ];
 
   return (
@@ -41,7 +41,7 @@ export function Admin() {
           return (
             <button
               key={tabItem.key}
-              onClick={() => setTab(tabItem.key)}
+              // onClick={() => setTab(tabItem.key)}
               className={
                 tab === tabItem.key
                   ? "flex items-center gap-2 border-b-2 border-primary px-4 py-3 text-sm font-medium text-foreground"

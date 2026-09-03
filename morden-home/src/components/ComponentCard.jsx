@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext.js";
 
 export function FurnitureCard({ item }) {
   const imageUrl = getComponentImageUrl(item);
-  const { isAdmin } = useAuth();
+  const { isAdmin, isCustomer } = useAuth();
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary hover:shadow-lg hover:shadow-primary/5">
@@ -27,11 +27,11 @@ export function FurnitureCard({ item }) {
             </div>
           )}
 
-          {!item.in_stock && (
+          {/* {!item.in_stock && (
             <span className="absolute left-3 top-3 rounded-full bg-foreground/80 px-2.5 py-1 text-xs font-medium text-background">
               Out of stock
             </span>
-          )}
+          )} */}
         </div>
 
         <div className="flex flex-1 flex-col p-4">
@@ -40,7 +40,7 @@ export function FurnitureCard({ item }) {
           </span>
 
           <h3 className="mt-1 font-display text-lg font-semibold leading-tight text-card-foreground">
-            Component #{item.id}
+            Component {item.id}
           </h3>
 
           {item.description && (
@@ -64,6 +64,22 @@ export function FurnitureCard({ item }) {
           Manage component
         </Link>
       )}
+
+      {isCustomer && (
+        <Link
+          to="/customizer"
+          state={{ component: item }}
+          className="mx-4 mb-4 rounded-lg border border-primary px-3 py-2 text-center text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground"
+        >
+          Add to Custom
+        </Link>
+      )}
+
+      {/* {isCustomer && (
+        <Button type="button" className="mx-4 mb-4">
+          Add to Custom
+        </Button>
+      )} */}
     </article>
   );
 }

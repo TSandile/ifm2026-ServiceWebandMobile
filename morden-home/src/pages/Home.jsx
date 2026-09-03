@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { formatPrice, getComponentImageUrl } from "../lib/utils";
 import { useAuth } from "../context/AuthContext.js";
+import { Button } from "../components/ui/button";
 
 const COMPONENTS_ENDPOINT =
   import.meta.env.VITE_API_COMPONENTS_URL ??
@@ -78,6 +79,8 @@ function FurnitureCard({ item }) {
 }
 
 export function Home() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -126,6 +129,8 @@ export function Home() {
       ? items
       : items.filter((i) => i.category === activeCategory);
 
+  const isCustomer = String(user?.role || "").toUpperCase() === "CUSTOMER";
+
   return (
     <div>
       <section className="border-b border-border bg-secondary/40">
@@ -141,12 +146,12 @@ export function Home() {
               Browse our catalog of modular pieces and discover which components
               pair perfectly to build your ideal space.
             </p>
-            <a
+            {/* <a
               href="#catalog"
               className="mt-6 inline-flex items-center gap-2 text-base font-medium text-primary hover:underline"
             >
               Explore the catalog <ArrowRight className="h-4 w-4" />
-            </a>
+            </a> */}
           </div>
 
           <div className="relative aspect-4/3 overflow-hidden rounded-2xl border border-border bg-muted">
@@ -171,21 +176,11 @@ export function Home() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={
-                  activeCategory === cat
-                    ? "rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground"
-                    : "rounded-full border border-border bg-background px-4 py-1.5 text-sm font-medium text-muted-foreground hover:border-primary hover:text-foreground"
-                }
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+          {isCustomer && (
+            <Button type="button" onClick={() => navigate("/customizer")}>
+              Start Customizing
+            </Button>
+          )}
         </div>
 
         {loading ? (

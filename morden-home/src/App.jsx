@@ -7,6 +7,7 @@ import { FurnitureDetail } from "./pages/FurnitureDetail";
 import { Register } from "./pages/Register";
 import { Login } from "./pages/Login";
 import { Admin } from "./pages/Admin";
+import { Customizer } from "./pages/Customizer";
 import { useAuth } from "./context/AuthContext.js";
 
 function RequireAdmin({ children }) {
@@ -46,6 +47,7 @@ function App() {
           <Route path="/furniture/:id" element={<FurnitureDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/customizer" element={<Customizer />} />
           <Route
             path="/admin"
             element={

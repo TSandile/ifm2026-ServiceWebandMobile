@@ -127,14 +127,14 @@ export function FurnitureDetail() {
           </span>
 
           <h1 className="mt-1 font-display text-3xl font-semibold text-foreground">
-            Component #{item.id}
+            Component {item.id}
           </h1>
 
           <p className="mt-3 text-2xl font-semibold text-foreground">
             {formatPrice(item.price)}
           </p>
 
-          <span
+          {/* <span
             className={
               item.in_stock
                 ? "mt-3 inline-block rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground"
@@ -142,7 +142,7 @@ export function FurnitureDetail() {
             }
           >
             {item.in_stock ? "In stock" : "Out of stock"}
-          </span>
+          </span> */}
 
           {item.description && (
             <p className="mt-5 text-pretty leading-relaxed text-muted-foreground">

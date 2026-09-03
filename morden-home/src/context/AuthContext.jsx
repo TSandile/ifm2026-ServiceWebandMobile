@@ -3,11 +3,21 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { AuthContext } from "./AuthContext.js";
 
+const USER_ROLES = ["CUSTOMER", "CLERK", "MANAGER"];
+
+function getUserRole(user) {
+  const role = String(user?.role || "")
+    .trim()
+    .toUpperCase();
+
+  return role || null;
+}
+
 function hasAdminRole(user) {
   return Boolean(
     user?.is_admin ||
     user?.isAdmin ||
-    ["admin", "role_admin"].includes(String(user?.role || "").toLowerCase()),
+    ["ADMIN", "ROLE_ADMIN"].includes(getUserRole(user)),
   );
 }
 
@@ -135,7 +145,9 @@ export function AuthProvider({ children }) {
 
       const loggedInUser =
         responseBody?.user ||
+        responseBody?.payload ||
         responseBody?.data?.user ||
+        responseBody?.data?.payload ||
         responseBody?.data ||
         responseBody;
 
@@ -174,7 +186,8 @@ export function AuthProvider({ children }) {
 
   const value = {
     session,
-    user: session?.user || apiUser,
+    user: apiUser || session?.user,
+    role: getUserRole(apiUser || session?.user),
     profile,
     loading,
     isAdmin:
@@ -182,6 +195,9 @@ export function AuthProvider({ children }) {
       apiUser?.is_admin ||
       apiUser?.isAdmin ||
       hasAdminRole(apiUser),
+    isCustomer: getUserRole(apiUser || session?.user) === USER_ROLES[0],
+    isClerk: getUserRole(apiUser || session?.user) === USER_ROLES[1],
+    isManager: getUserRole(apiUser || session?.user) === USER_ROLES[2],
     signUp,
     signIn,
     signOut,
