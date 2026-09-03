@@ -23,17 +23,50 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
   const [deletingId, setDeletingId] = useState(null);
 
   async function load() {
-    if (!supabase) {
+    try {
+      const response = await fetch(
+        "http://localhost:8081/api/components/getAllComponents",
+        {
+          headers: { Accept: "application/json" },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to load components (${response.status})`);
+      }
+
+      const payload = await response.json().catch(() => null);
+      const candidates = [
+        payload,
+        payload?.data,
+        payload?.components,
+        payload?.items,
+        payload?.result,
+      ];
+
+      const normalized = candidates.find((entry) => Array.isArray(entry));
+
+      if (normalized) {
+        setItems(normalized);
+        return;
+      }
+
+      if (payload && typeof payload === "object") {
+        const nestedList = Object.values(payload).find((entry) =>
+          Array.isArray(entry),
+        );
+
+        if (nestedList) {
+          setItems(nestedList);
+          return;
+        }
+      }
+
       setItems([]);
-      return;
+    } catch (err) {
+      console.error("Failed to load components from API:", err);
+      setItems([]);
     }
-
-    const { data } = await supabase
-      .from("furniture")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    setItems(data ?? []);
   }
 
   useEffect(() => {
@@ -221,7 +254,7 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
 
     try {
       const response = await fetch(
-        `http://localhost:8081/api/component/deleteComponent/${encodeURIComponent(id)}`,
+        `http://localhost:8081/api/components/deleteComponent/${encodeURIComponent(id)}`,
         {
           method: "DELETE",
           headers: { Accept: "application/json" },

@@ -26,7 +26,7 @@ export function Admin() {
         </span>
 
         <h1 className="font-display text-3xl font-semibold text-foreground">
-          Welcome{profile?.full_name ? `, ${profile.full_name}` : ""}
+          Welcome{profile?.name ? `, ${profile.name}` : ""}
         </h1>
 
         <p className="text-muted-foreground">
