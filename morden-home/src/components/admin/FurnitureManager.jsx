@@ -317,7 +317,7 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
                   category: e.target.value,
                 })
               }
-              placeholder="e.g. Seating, Tables, Storage"
+              placeholder="e.g. Leg, Top"
             />
           </div>
 
@@ -373,7 +373,7 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
               />
             </div>
 
-            <label className="flex items-center gap-2 text-sm text-foreground">
+            {/* <label className="flex items-center gap-2 text-sm text-foreground">
               <input
                 type="checkbox"
                 checked={form.in_stock}
@@ -386,7 +386,7 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
                 className="h-4 w-4 rounded border-border accent-[#05abb9]"
               />
               In stock
-            </label>
+            </label> */}
 
             {error && (
               <p
