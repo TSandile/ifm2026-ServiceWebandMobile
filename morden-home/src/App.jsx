@@ -11,7 +11,7 @@ import { Customizer } from "./pages/Customizer";
 import { useAuth } from "./context/AuthContext.js";
 
 function RequireAdmin({ children }) {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, isClerk, loading } = useAuth();
 
   if (loading) {
     return (
@@ -21,7 +21,7 @@ function RequireAdmin({ children }) {
     );
   }
   if (!user) return <Navigate to="/login" replace />;
-  if (!isAdmin) return <Navigate to="/" replace />;
+  if (!isAdmin && !isClerk) return <Navigate to="/" replace />;
 
   return children;
 }

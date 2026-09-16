@@ -2,18 +2,51 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Check, Plus, X } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { formatPrice, getComponentImageUrl } from "../lib/utils";
+import {
+  formatPrice,
+  getComponentImageUrl,
+  normalizeComponent,
+} from "../lib/utils";
 
 const COMPONENTS_ENDPOINT =
   import.meta.env.VITE_API_COMPONENTS_URL ??
   "http://localhost:8081/api/components/getAllComponents";
 
+const PRODUCT_OPTIONS = [
+  {
+    value: "kitchen-chair",
+    label: "Build Kitcken Chair",
+    terms: ["kitchen chair", "chair"],
+  },
+  {
+    value: "kitchen-table",
+    label: "Build Kitchen Table",
+    terms: ["kitchen table", "table"],
+  },
+  {
+    value: "dining-chair",
+    label: "Build Dinning chair",
+    terms: ["dining chair", "dinning chair", "chair"],
+  },
+  {
+    value: "dining-table",
+    label: "Build a Dinning Table",
+    terms: ["dining table", "dinning table", "table"],
+  },
+];
+
 function getComponents(payload) {
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload?.data)) return payload.data;
-  if (Array.isArray(payload?.components)) return payload.components;
-  if (Array.isArray(payload?.payload)) return payload.payload;
-  return [];
+  const components = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.data)
+      ? payload.data
+      : Array.isArray(payload?.components)
+        ? payload.components
+        : Array.isArray(payload?.payload)
+          ? payload.payload
+          : [];
+
+  return components.map(normalizeComponent);
 }
 
 export function Customizer() {
@@ -21,8 +54,9 @@ export function Customizer() {
   const startingComponent = location.state?.component;
   const [components, setComponents] = useState([]);
   const [selected, setSelected] = useState(
-    startingComponent ? [startingComponent] : [],
+    startingComponent ? [normalizeComponent(startingComponent)] : [],
   );
+  const [product, setProduct] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -67,6 +101,21 @@ export function Customizer() {
     0,
   );
 
+  const visibleComponents = useMemo(() => {
+    if (!product) return components;
+
+    const selectedProduct = PRODUCT_OPTIONS.find(
+      (option) => option.value === product,
+    );
+
+    if (!selectedProduct) return components;
+
+    return components.filter((component) => {
+      const category = String(component.category ?? "").toLowerCase();
+      return selectedProduct.terms.some((term) => category.includes(term));
+    });
+  }, [components, product]);
+
   function toggleComponent(component) {
     const componentId = String(component.id);
 
@@ -88,9 +137,27 @@ export function Customizer() {
           <p className="text-sm font-medium uppercase tracking-wide text-primary">
             Build your set
           </p>
-          <h1 className="mt-1 font-display text-3xl font-semibold text-foreground">
-            Customizer
-          </h1>
+          <div className="mt-1 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <h1 className="font-display text-3xl font-semibold text-foreground">
+              Customizer
+            </h1>
+            <label className="sr-only" htmlFor="product-builder">
+              Customize by end Product
+            </label>
+            <select
+              id="product-builder"
+              value={product}
+              onChange={(event) => setProduct(event.target.value)}
+              className="rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-card-foreground shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+            >
+              <option value="">Cusomize by end Product</option>
+              {PRODUCT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <p className="mt-2 text-muted-foreground">
             Select multiple components to assemble your desired furniture.
           </p>
@@ -118,13 +185,13 @@ export function Customizer() {
             <p className="mt-6 rounded-xl border border-dashed border-border p-6 text-muted-foreground">
               {error}
             </p>
-          ) : components.length === 0 ? (
+          ) : visibleComponents.length === 0 ? (
             <p className="mt-6 rounded-xl border border-dashed border-border p-6 text-muted-foreground">
-              No components are available yet.
+              No components are available for this product.
             </p>
           ) : (
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              {components.map((component) => {
+              {visibleComponents.map((component) => {
                 const isSelected = selectedIds.has(String(component.id));
                 const imageUrl = getComponentImageUrl(component);
 

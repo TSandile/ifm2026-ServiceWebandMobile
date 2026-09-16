@@ -35,7 +35,7 @@ function Button({
 }
 
 export function Navbar() {
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, isClerk, signOut } = useAuth();
 
   const handleSignOut = async () => {
     await signOut();
@@ -61,11 +61,11 @@ export function Navbar() {
             </Button>
           </Link>
 
-          {isAdmin && (
+          {(isAdmin || isClerk) && (
             <Link to="/admin">
               <Button variant="ghost" size="sm">
                 <Shield className="h-4 w-4" />
-                <span className="hidden sm:inline">Admin</span>
+                <span className="hidden sm:inline">Manage components</span>
               </Button>
             </Link>
           )}

@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { formatPrice, getComponentImageUrl } from "../lib/utils";
+import {
+  formatPrice,
+  getComponentImageUrl,
+  normalizeComponent,
+} from "../lib/utils";
 import { useAuth } from "../context/AuthContext.js";
 import { Button } from "../components/ui/button";
 
@@ -10,15 +14,20 @@ const COMPONENTS_ENDPOINT =
   "http://localhost:8081/api/components/getAllComponents";
 
 function getComponents(payload) {
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload?.data)) return payload.data;
-  if (Array.isArray(payload?.components)) return payload.components;
-  return [];
+  const components = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.data)
+      ? payload.data
+      : Array.isArray(payload?.components)
+        ? payload.components
+        : [];
+
+  return components.map(normalizeComponent);
 }
 
 function FurnitureCard({ item }) {
   const image = getComponentImageUrl(item);
-  const { isAdmin } = useAuth();
+  const { isAdmin, isClerk } = useAuth();
 
   return (
     <article className="overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
@@ -61,11 +70,10 @@ function FurnitureCard({ item }) {
 
         <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
           <span>{item.in_stock ? "In stock" : "Out of stock"}</span>
-          <span>{item.dimensions || "Custom sizing"}</span>
         </div>
       </div>
 
-      {isAdmin && (
+      {(isAdmin || isClerk) && (
         <Link
           to={`/admin?componentId=${encodeURIComponent(item.id)}`}
           state={{ component: item }}

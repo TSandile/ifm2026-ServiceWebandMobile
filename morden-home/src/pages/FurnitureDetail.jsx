@@ -5,7 +5,11 @@ import { supabase } from "../lib/supabase";
 //import { supabase } from "@/lib/supabase";
 import { FurnitureCard } from "../components/ComponentCard";
 //import { FurnitureCard } from "@/components/FurnitureCard";
-import { formatPrice, getComponentImageUrl } from "../lib/utils";
+import {
+  formatPrice,
+  getComponentImageUrl,
+  normalizeComponent,
+} from "../lib/utils";
 //import { formatPrice } from "@/lib/utils";
 
 export function FurnitureDetail() {
@@ -25,7 +29,7 @@ export function FurnitureDetail() {
         .eq("id", id)
         .maybeSingle();
 
-      setItem(current);
+      setItem(normalizeComponent(current));
 
       // Find all pairings that reference this item, in either column.
       const { data: pairs } = await supabase

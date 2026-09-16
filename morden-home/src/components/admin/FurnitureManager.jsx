@@ -1,18 +1,35 @@
 import { useEffect, useState } from "react";
-import { Pencil, Plus, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Save, Trash2, X } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { Label, Textarea } from "../ui/field";
-import { formatPrice, getComponentImageUrl } from "../../lib/utils";
+import { Label, Select, Textarea } from "../ui/field";
+import {
+  formatPrice,
+  getComponentImageUrl,
+  normalizeComponent,
+} from "../../lib/utils";
 
 const emptyForm = {
   category: "",
+  compatibility: "",
   description: "",
   price: "",
   image: null,
   in_stock: true,
 };
+
+const CATEGORY_OPTIONS = [
+  ["KITCHEN_SEATING", "Kitchen seating"],
+  ["KITCHEN_TABLE", "Kitchen table"],
+  ["DINING_SEATING", "Dining seating"],
+  ["DINING_TABLE", "Dining table"],
+];
+
+const COMPATIBILITY_OPTIONS = [
+  ["CHAIR", "Chair"],
+  ["TABLE", "Table"],
+];
 
 export function FurnitureManager({ componentId, selectedComponent, onChange }) {
   const [items, setItems] = useState([]);
@@ -21,6 +38,7 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [updatingStockId, setUpdatingStockId] = useState(null);
 
   async function load() {
     try {
@@ -47,7 +65,7 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
       const normalized = candidates.find((entry) => Array.isArray(entry));
 
       if (normalized) {
-        setItems(normalized);
+        setItems(normalized.map(normalizeComponent));
         return;
       }
 
@@ -57,7 +75,7 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
         );
 
         if (nestedList) {
-          setItems(nestedList);
+          setItems(nestedList.map(normalizeComponent));
           return;
         }
       }
@@ -139,6 +157,7 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
 
     setForm({
       category: item.category ?? "",
+      compatibility: item.compatibility ?? item.compatible ?? "",
       description: item.description ?? "",
       price: String(item.price),
       image: null,
@@ -168,6 +187,8 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
 
     if (editingId) {
       const payload = {
+        category: form.category.trim() || null,
+        compatibility: form.compatibility.trim() || null,
         description: form.description.trim(),
         price: priceNum,
       };
@@ -203,6 +224,8 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
       }
 
       const payload = new FormData();
+      payload.append("category", form.category.trim());
+      payload.append("compatibility", form.compatibility.trim());
       payload.append("description", form.description.trim());
       payload.append("price", String(priceNum));
       payload.append("image", form.image);
@@ -281,6 +304,56 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
     }
   }
 
+  async function handleStockLevelUpdate(item) {
+    const stockLevel = Number(item.stock_level);
+
+    if (!Number.isInteger(stockLevel) || stockLevel < 0) {
+      return setError("Stock level must be a whole number of 0 or more.");
+    }
+
+    setUpdatingStockId(item.id);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `http://localhost:8081/api/components/updateStockLevel/${encodeURIComponent(item.id)}`,
+        {
+          method: "PUT",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ stock_level: stockLevel }),
+        },
+      );
+
+      if (!response.ok) {
+        const responseBody = await response.json().catch(() => null);
+        throw new Error(
+          responseBody?.message ||
+            responseBody?.error ||
+            `Stock level update failed with status ${response.status}`,
+        );
+      }
+
+      setItems((currentItems) =>
+        currentItems.map((currentItem) =>
+          currentItem.id === item.id
+            ? {
+                ...currentItem,
+                stock_level: stockLevel,
+                in_stock: stockLevel > 0,
+              }
+            : currentItem,
+        ),
+      );
+    } catch (err) {
+      setError(err.message || "Stock level update failed. Please try again.");
+    } finally {
+      setUpdatingStockId(null);
+    }
+  }
+
   return (
     <div className="grid gap-8 lg:grid-cols-[380px_1fr]">
       {/* Form */}
@@ -308,7 +381,7 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
           <div>
             <Label htmlFor="category">Category</Label>
 
-            <Input
+            <Select
               id="category"
               value={form.category}
               onChange={(e) =>
@@ -317,8 +390,38 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
                   category: e.target.value,
                 })
               }
-              placeholder="e.g. Leg, Top"
-            />
+              required
+            >
+              <option value="">Select category</option>
+              {CATEGORY_OPTIONS.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="compatibility">Compatibility</Label>
+
+            <Select
+              id="compatibility"
+              value={form.compatibility}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  compatibility: e.target.value,
+                })
+              }
+              required
+            >
+              <option value="">Select compatibility</option>
+              {COMPATIBILITY_OPTIONS.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </Select>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -342,7 +445,7 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
             </div>
 
             <div>
-              <Label htmlFor="image">Component image</Label>
+              <Label htmlFor="image">Image</Label>
 
               <Input
                 id="image"
@@ -442,6 +545,49 @@ export function FurnitureManager({ componentId, selectedComponent, onChange }) {
                   {item.category} · {formatPrice(item.price)} ·{" "}
                   {item.in_stock ? "In stock" : "Out of stock"}
                 </p>
+
+                <div className="mt-2 flex items-end gap-2">
+                  <div>
+                    <Label htmlFor={`stock-level-${item.id}`}>
+                      Stock level
+                    </Label>
+
+                    <Input
+                      id={`stock-level-${item.id}`}
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={item.stock_level ?? 0}
+                      onChange={(e) =>
+                        setItems((currentItems) =>
+                          currentItems.map((currentItem) =>
+                            currentItem.id === item.id
+                              ? {
+                                  ...currentItem,
+                                  stock_level: e.target.value,
+                                }
+                              : currentItem,
+                          ),
+                        )
+                      }
+                      className="w-28"
+                    />
+                  </div>
+
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={
+                      saving || deletingId !== null || updatingStockId !== null
+                    }
+                    onClick={() => handleStockLevelUpdate(item)}
+                    aria-label={`Save stock level for component ${item.id}`}
+                  >
+                    <Save className="h-4 w-4" />
+                    Save stock
+                  </Button>
+                </div>
               </div>
 
               <div className="flex gap-1">
