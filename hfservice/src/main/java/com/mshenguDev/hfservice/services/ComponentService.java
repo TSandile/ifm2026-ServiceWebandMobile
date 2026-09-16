@@ -11,9 +11,12 @@ public interface ComponentService{
     String addComponent(ComponentDto componentDto);
     Optional<Component> retrieveComponentById(Long id);
     Optional<Component> retrieveComponentByType(String type);
+    Optional<Component> retrieveComponentByCategory(String category);
+    Optional<Component> retrieveComponentByCompatibility(String compatibility);
     List<Component> retrieveAllComponents();
     Long removeComponentById(Long id);
     String update(Long id, ComponentDto componentDto);
     String uploadImage(Long id, MultipartFile image) throws java.io.IOException;
     String registerComponent(ComponentDto componentDto, MultipartFile image) throws java.io.IOException;
+    String updateStockLevel(Long id, Integer stockLevel);
 }

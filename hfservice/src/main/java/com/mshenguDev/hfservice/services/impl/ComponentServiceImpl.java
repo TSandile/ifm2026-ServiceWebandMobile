@@ -1,9 +1,7 @@
 package com.mshenguDev.hfservice.services.impl;
 
-import com.mshenguDev.hfservice.entities.Component;
-import com.mshenguDev.hfservice.entities.ComponentType;
+import com.mshenguDev.hfservice.entities.*;
 import com.mshenguDev.hfservice.entities.Dto.ComponentDto;
-import com.mshenguDev.hfservice.entities.Material;
 import com.mshenguDev.hfservice.repositories.ComponentRepository;
 import com.mshenguDev.hfservice.services.ComponentService;
 import org.springframework.stereotype.Service;
@@ -17,94 +15,102 @@ import java.util.Optional;
 public class ComponentServiceImpl implements ComponentService {
     private final ComponentRepository componentRepository;
 
-    public ComponentServiceImpl(ComponentRepository componentRepository){
+    public ComponentServiceImpl(ComponentRepository componentRepository) {
         this.componentRepository = componentRepository;
     }
 
     @Override
     public String addComponent(ComponentDto componentDto) {
-        if( componentDto.getDescription().isBlank() || componentDto.getPrice() == null){
+        if (componentDto.getDescription().isBlank() || componentDto.getPrice() == null) {
             throw new NullPointerException("Entity fields are empty");
         }
         Component newComponent = new Component(componentDto.getDescription(), componentDto.getPrice());
-        if(componentDto.getDescription().toUpperCase().contains("TABLE")){
-            if(componentDto.getDescription().toUpperCase().contains("LEG")){
+        newComponent.setCategory(componentDto.getCategory());
+        newComponent.setCompatibility(componentDto.getCompatibility());
+        if (componentDto.getDescription().toUpperCase().contains("TABLE")) {
+            if (componentDto.getDescription().toUpperCase().contains("LEG")) {
                 newComponent.setType(ComponentType.TABLE_LEG);
-                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
+                if (componentDto.getDescription().toUpperCase().contains("WOOD")) {
                     newComponent.setMaterial(Material.WOOD);
-                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
+                } else if (componentDto.getDescription().toUpperCase().contains("STEEL")) {
                     newComponent.setMaterial(Material.STEEL);
                 }
             } else if (componentDto.getDescription().toUpperCase().contains("TOP")) {
                 newComponent.setType(ComponentType.TABLE_TOP);
-                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
+                if (componentDto.getDescription().toUpperCase().contains("WOOD")) {
                     newComponent.setMaterial(Material.WOOD);
-                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
+                } else if (componentDto.getDescription().toUpperCase().contains("STEEL")) {
                     newComponent.setMaterial(Material.STEEL);
                 }
             }
 
-        }else if(componentDto.getDescription().toUpperCase().contains("CHAIR")){{
-            if(componentDto.getDescription().toUpperCase().contains("SEAT")){
-                newComponent.setType(ComponentType.CHAIR_SEAT);
-                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
-                    newComponent.setMaterial(Material.WOOD);
-                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
-                    newComponent.setMaterial(Material.STEEL);
-                }
-            }else if(componentDto.getDescription().toUpperCase().contains("LEG")){
-                newComponent.setType(ComponentType.CHAIR_LEG);
-                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
-                    newComponent.setMaterial(Material.WOOD);
-                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
-                    newComponent.setMaterial(Material.STEEL);
+        } else if (componentDto.getDescription().toUpperCase().contains("CHAIR")) {
+            {
+                if (componentDto.getDescription().toUpperCase().contains("SEAT")) {
+                    newComponent.setType(ComponentType.CHAIR_SEAT);
+                    if (componentDto.getDescription().toUpperCase().contains("WOOD")) {
+                        newComponent.setMaterial(Material.WOOD);
+                    } else if (componentDto.getDescription().toUpperCase().contains("STEEL")) {
+                        newComponent.setMaterial(Material.STEEL);
+                    }
+                } else if (componentDto.getDescription().toUpperCase().contains("LEG")) {
+                    newComponent.setType(ComponentType.CHAIR_LEG);
+                    if (componentDto.getDescription().toUpperCase().contains("WOOD")) {
+                        newComponent.setMaterial(Material.WOOD);
+                    } else if (componentDto.getDescription().toUpperCase().contains("STEEL")) {
+                        newComponent.setMaterial(Material.STEEL);
+                    }
                 }
             }
-        }}
+        }
         componentRepository.save(newComponent);
         return "SUCCESS";
     }
 
     @Override
-    public String registerComponent(ComponentDto componentDto , MultipartFile image) throws IOException{
-        if( componentDto.getDescription().isBlank() || componentDto.getPrice() == null){
+    public String registerComponent(ComponentDto componentDto, MultipartFile image) throws IOException {
+        if (componentDto.getDescription().isBlank() || componentDto.getPrice() == null) {
             throw new NullPointerException("Entity fields are empty");
         }
         Component newComponent = new Component(componentDto.getDescription(), componentDto.getPrice());
-        if(componentDto.getDescription().toUpperCase().contains("TABLE")){
-            if(componentDto.getDescription().toUpperCase().contains("LEG")){
+        newComponent.setCategory(componentDto.getCategory());
+        newComponent.setCompatibility(componentDto.getCompatibility());
+        if (componentDto.getDescription().toUpperCase().contains("TABLE")) {
+            if (componentDto.getDescription().toUpperCase().contains("LEG")) {
                 newComponent.setType(ComponentType.TABLE_LEG);
-                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
+                if (componentDto.getDescription().toUpperCase().contains("WOOD")) {
                     newComponent.setMaterial(Material.WOOD);
-                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
+                } else if (componentDto.getDescription().toUpperCase().contains("STEEL")) {
                     newComponent.setMaterial(Material.STEEL);
                 }
             } else if (componentDto.getDescription().toUpperCase().contains("TOP")) {
                 newComponent.setType(ComponentType.TABLE_TOP);
-                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
+                if (componentDto.getDescription().toUpperCase().contains("WOOD")) {
                     newComponent.setMaterial(Material.WOOD);
-                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
+                } else if (componentDto.getDescription().toUpperCase().contains("STEEL")) {
                     newComponent.setMaterial(Material.STEEL);
                 }
             }
 
-        }else if(componentDto.getDescription().toUpperCase().contains("CHAIR")){{
-            if(componentDto.getDescription().toUpperCase().contains("SEAT")){
-                newComponent.setType(ComponentType.CHAIR_SEAT);
-                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
-                    newComponent.setMaterial(Material.WOOD);
-                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
-                    newComponent.setMaterial(Material.STEEL);
-                }
-            }else if(componentDto.getDescription().toUpperCase().contains("LEG")){
-                newComponent.setType(ComponentType.CHAIR_LEG);
-                if(componentDto.getDescription().toUpperCase().contains("WOOD")){
-                    newComponent.setMaterial(Material.WOOD);
-                }else if(componentDto.getDescription().toUpperCase().contains("STEEL")){
-                    newComponent.setMaterial(Material.STEEL);
+        } else if (componentDto.getDescription().toUpperCase().contains("CHAIR")) {
+            {
+                if (componentDto.getDescription().toUpperCase().contains("SEAT")) {
+                    newComponent.setType(ComponentType.CHAIR_SEAT);
+                    if (componentDto.getDescription().toUpperCase().contains("WOOD")) {
+                        newComponent.setMaterial(Material.WOOD);
+                    } else if (componentDto.getDescription().toUpperCase().contains("STEEL")) {
+                        newComponent.setMaterial(Material.STEEL);
+                    }
+                } else if (componentDto.getDescription().toUpperCase().contains("LEG")) {
+                    newComponent.setType(ComponentType.CHAIR_LEG);
+                    if (componentDto.getDescription().toUpperCase().contains("WOOD")) {
+                        newComponent.setMaterial(Material.WOOD);
+                    } else if (componentDto.getDescription().toUpperCase().contains("STEEL")) {
+                        newComponent.setMaterial(Material.STEEL);
+                    }
                 }
             }
-        }}
+        }
         if (image == null || image.isEmpty()) {
             throw new IllegalArgumentException("Image file is empty");
         }
@@ -122,6 +128,22 @@ public class ComponentServiceImpl implements ComponentService {
     }
 
     @Override
+    public String updateStockLevel(Long id, Integer stockLevel) {
+        if (stockLevel == null || stockLevel < 0) {
+            throw new IllegalArgumentException("Stock level must be 0 or greater");
+        }
+
+        Component component = componentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Component not found"));
+
+        component.setStock_level(stockLevel);
+        component.setIn_stock(stockLevel > 0);
+        componentRepository.save(component);
+
+        return "SUCCESS";
+    }
+
+    @Override
     public Optional<Component> retrieveComponentById(Long id) {
         return componentRepository.findById(id);
     }
@@ -131,6 +153,15 @@ public class ComponentServiceImpl implements ComponentService {
         return componentRepository.findByType(type);
     }
 
+    @Override
+    public Optional<Component> retrieveComponentByCategory(String category) {
+        return componentRepository.findByCategory(Furniture_Category.valueOf(category.toUpperCase()));
+    }
+
+    @Override
+    public Optional<Component> retrieveComponentByCompatibility(String compatibility) {
+        return componentRepository.findByCompatibility(Compatibility.valueOf(compatibility.toUpperCase()));
+    }
 
     @Override
     public List<Component> retrieveAllComponents() {
@@ -139,10 +170,10 @@ public class ComponentServiceImpl implements ComponentService {
 
     @Override
     public Long removeComponentById(Long id) {
-        if(componentRepository.existsById(id)){
+        if (componentRepository.existsById(id)) {
             componentRepository.deleteById(id);
             return id;
-        }else{
+        } else {
             return null;
         }
     }
@@ -151,9 +182,11 @@ public class ComponentServiceImpl implements ComponentService {
     public String update(Long id, ComponentDto componentDto) {
         Component component = componentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Component not found"));
-       // component.setType(componentDto.getType());
+        // component.setType(componentDto.getType());
         component.setDescription(componentDto.getDescription());
         component.setPrice(componentDto.getPrice());
+        component.setCategory(componentDto.getCategory());
+        component.setCompatibility(componentDto.getCompatibility());
         componentRepository.save(component);
 
         return "SUCCESS";
