@@ -16,22 +16,22 @@ const PRODUCT_OPTIONS = [
   {
     value: "kitchen-chair",
     label: "Build Kitcken Chair",
-    terms: ["kitchen chair", "chair"],
+    category: "KITCHEN_SEATING",
   },
   {
     value: "kitchen-table",
     label: "Build Kitchen Table",
-    terms: ["kitchen table", "table"],
+    category: "KITCHEN_TABLE",
   },
   {
     value: "dining-chair",
     label: "Build Dinning chair",
-    terms: ["dining chair", "dinning chair", "chair"],
+    category: "DINING_SEATING",
   },
   {
     value: "dining-table",
     label: "Build a Dinning Table",
-    terms: ["dining table", "dinning table", "table"],
+    category: "DINING_TABLE",
   },
 ];
 
@@ -111,8 +111,11 @@ export function Customizer() {
     if (!selectedProduct) return components;
 
     return components.filter((component) => {
-      const category = String(component.category ?? "").toLowerCase();
-      return selectedProduct.terms.some((term) => category.includes(term));
+      return (
+        String(component.category ?? "")
+          .trim()
+          .toUpperCase() === selectedProduct.category
+      );
     });
   }, [components, product]);
 
