@@ -30,12 +30,6 @@ public class SecurityConfig {
         http
                 .cors(org.springframework.security.config.Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.GET, "/api/orders/booking-stats").hasRole("MANAGER")
-                        .requestMatchers(HttpMethod.GET, "/api/orders/getAllOrders")
-                        .hasAnyRole("CLERK", "MANAGER")
-                        .requestMatchers(HttpMethod.GET, "/api/orders/getByCustomerId/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/orders/addOrder").authenticated()
                         .anyRequest().permitAll())
                 .securityContext(context ->
                         context.securityContextRepository(securityContextRepository))
@@ -43,10 +37,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .csrf(csrf -> csrf
-                        .csrfTokenRepository(csrfTokenRepository)
-                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                        .requireCsrfProtectionMatcher(orderStatusUpdate));
+                .csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
 
