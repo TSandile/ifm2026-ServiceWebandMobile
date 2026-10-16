@@ -3,6 +3,7 @@ package com.mshenguDev.hfservice.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -18,6 +19,24 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 
 @Configuration
 public class SecurityConfig {
+//    @Bean
+//    SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+//        http
+//                .authorizeHttpRequests(request -> request
+//                        .requestMatchers("/**")
+//                        .permitAll()
+//                        .anyRequest()
+//                        .authenticated())
+////                .httpBasic(Customizer.withDefaults())
+//                .csrf(csrf -> csrf.disable());
+//        return http.build();
+//    }
+//
+//    @Bean
+//    PasswordEncoder passwordEncoder(){
+//        return new BCryptPasswordEncoder();
+//    }
+
     @Bean
     SecurityFilterChain filterChain(
             HttpSecurity http,
