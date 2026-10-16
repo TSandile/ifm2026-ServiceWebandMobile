@@ -30,7 +30,8 @@ public class SecurityConfig {
         http
                 .cors(org.springframework.security.config.Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request
-                        .anyRequest().permitAll())
+                        .requestMatchers("/api/**").permitAll()
+                        .anyRequest().authenticated())
                 .securityContext(context ->
                         context.securityContextRepository(securityContextRepository))
                 .sessionManagement(session ->
