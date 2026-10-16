@@ -1,6 +1,6 @@
 package com.mshenguDev.hfservice.entities;
 
-public enum Material {
+public enum ComponentMaterial {
     WOOD,
     STEEL,
     GLASS,

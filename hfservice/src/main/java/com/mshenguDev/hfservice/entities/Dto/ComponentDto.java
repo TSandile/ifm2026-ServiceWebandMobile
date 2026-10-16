@@ -1,61 +1,49 @@
 package com.mshenguDev.hfservice.entities.Dto;
 
-import com.mshenguDev.hfservice.entities.Compatibility;
-import com.mshenguDev.hfservice.entities.Furniture_Category;
+import com.mshenguDev.hfservice.entities.ComponentCompatibility;
+import com.mshenguDev.hfservice.entities.ComponentType;
+import com.mshenguDev.hfservice.entities.ComponentCategory;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.mshenguDev.hfservice.entities.ComponentMaterial;
 
 public class ComponentDto {
    // private String type;
    private String description;
    private Double price;
    @JsonAlias("compatible")
-   private Compatibility compatibility;
-   private Furniture_Category category;
-   // private byte[] image;
+   private ComponentCompatibility compatibility;
+   @JsonAlias("category")
+   private ComponentCategory category;
+   @JsonAlias("type")
+   private ComponentType type;
+   @JsonAlias("material")
+   private ComponentMaterial material;
 
-   public ComponentDto() {
-   }
+   public ComponentDto(){}
 
-   public ComponentDto(String description, Double price) {
-      // this.type = type ;
-      this.description = description;
-      this.price = price;
-      // this.image = image;
-   }
-
-   // public String getType(){return type;}
-   public String getDescription() {
-      return description;
-   }
-
-   public Double getPrice() {
-      return price;
-   }
-
-   public Compatibility getCompatibility() {
-      return compatibility;
-   }
-
-   public Furniture_Category getCategory() {
-      return category;
-   }
-   // public byte[] getImage(){return image;}
-
-   // public void setType(String type){this.type = type;}
-   public void setDescription(String description) {
-      this.description = description;
-   }
-
-   public void setPrice(Double price) {
-      this.price = price;
-   }
-
-   public void setCompatibility(Compatibility compatibility) {
-      this.compatibility = compatibility;
-   }
-
-   public void setCategory(Furniture_Category category) {
+   public ComponentDto(  ComponentCategory category, ComponentCompatibility compatibility, String description, Double price,  ComponentType type, ComponentMaterial material){
       this.category = category;
+      this.compatibility = compatibility;
+       this.description = description;
+       this.price = price;
+       this.type = type;
+       this.material = material;
    }
-   // public void setImage(byte[] image){this.image = image;}
+
+   //Mutators
+   public void setCategory(ComponentCategory category){this.category = category;}
+   public void setCompatibility(ComponentCompatibility compatibility){this.compatibility = compatibility;}
+   public void setDescription(String description){this.description = description;}
+   public void setPrice(Double price){this.price = price;}
+   public void setType(ComponentType type){this.type = type;}
+   public void setMaterial(ComponentMaterial material){this.material = material;}
+
+   //accessors
+   public ComponentCategory getCategory(){return category;}
+   public ComponentCompatibility getCompatibility(){return compatibility;}
+   public String getDescription(){return description;}
+   public Double getPrice(){return price;}
+   public ComponentType getType(){return type;}
+   public ComponentMaterial getMaterial(){return material;}
+
 }

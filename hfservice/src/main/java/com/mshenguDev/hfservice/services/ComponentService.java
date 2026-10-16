@@ -2,21 +2,23 @@ package com.mshenguDev.hfservice.services;
 
 import com.mshenguDev.hfservice.entities.Component;
 import com.mshenguDev.hfservice.entities.Dto.ComponentDto;
+import com.mshenguDev.hfservice.entities.Dto.InventoryReportDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface ComponentService{
-    String addComponent(ComponentDto componentDto);
+//    String addComponent(ComponentDto componentDto);
     Optional<Component> retrieveComponentById(Long id);
     Optional<Component> retrieveComponentByType(String type);
     Optional<Component> retrieveComponentByCategory(String category);
     Optional<Component> retrieveComponentByCompatibility(String compatibility);
     List<Component> retrieveAllComponents();
     Long removeComponentById(Long id);
-    String update(Long id, ComponentDto componentDto);
+    String update(Long id, ComponentDto componentDto, MultipartFile image) throws java.io.IOException;
     String uploadImage(Long id, MultipartFile image) throws java.io.IOException;
     String registerComponent(ComponentDto componentDto, MultipartFile image) throws java.io.IOException;
     String updateStockLevel(Long id, Integer stockLevel);
+    InventoryReportDto buildInventoryReport();
 }

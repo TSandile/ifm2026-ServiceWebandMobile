@@ -1,9 +1,8 @@
 package com.mshenguDev.hfservice.controllers;
 
-import com.mshenguDev.hfservice.entities.Component;
-import com.mshenguDev.hfservice.entities.Compatibility;
-import com.mshenguDev.hfservice.entities.Furniture_Category;
+import com.mshenguDev.hfservice.entities.*;
 import com.mshenguDev.hfservice.entities.Dto.ComponentDto;
+import com.mshenguDev.hfservice.entities.Dto.InventoryReportDto;
 import com.mshenguDev.hfservice.entities.Dto.StockLevelDto;
 import com.mshenguDev.hfservice.services.ComponentService;
 import org.springframework.http.HttpStatus;
@@ -26,31 +25,32 @@ public class ComponentController {
         this.componentService = componentService;
     }
 
-    @PostMapping(path = "/addComponent")
-    public ResponseEntity<?> addComponent(@RequestBody ComponentDto componentDto) {
-        String Response = componentService.addComponent(componentDto);
-        if (!Response.equals("SUCCESS")) {
-            return ResponseEntity.status(500).body("Failed to add component");
-        }
-        return ResponseEntity.ok("Component added successfully");
-    }
+//    @PostMapping(path = "/addComponent")
+//    public ResponseEntity<?> addComponent(@RequestBody ComponentDto componentDto) {
+//        String Response = componentService.addComponent(componentDto);
+//        if (!Response.equals("SUCCESS")) {
+//            return ResponseEntity.status(500).body("Failed to add component");
+//        }
+//        return ResponseEntity.ok("Component added successfully");
+//    }
 
     @PostMapping("/registerComponent")
-    public ResponseEntity<?> registerComponent(@RequestParam("description") String description,
+    public ResponseEntity<?> registerComponent(
+            @RequestParam("description") String description,
             @RequestParam("price") Double price,
-            @RequestParam(value = "category", required = false) String category,
-            @RequestParam(value = "compatibility", required = false) String compatibility,
+            @RequestParam(value = "category", required = true) String category,
+            @RequestParam(value = "compatibility", required = true) String compatibility,
+            @RequestParam(value = "type", required = true) String type,
+            @RequestParam(value = "material", required = true) String material,
             @RequestParam("image") MultipartFile image) {
-        ComponentDto componentDto = new ComponentDto(description, price);
-        if (category != null && !category.isBlank()) {
-            componentDto.setCategory(Furniture_Category.valueOf(category.trim().toUpperCase()));
-        }
-        if (compatibility != null && !compatibility.isBlank()) {
-            componentDto.setCompatibility(Compatibility.valueOf(compatibility.trim().toUpperCase()));
-        }
-        if (image == null || image.isEmpty()) {
-            return ResponseEntity.badRequest().body("Image file is required");
-        }
+        ComponentDto componentDto = new ComponentDto();
+//
+        componentDto.setCategory(ComponentCategory.valueOf(category.trim().toUpperCase()));
+        componentDto.setCompatibility(ComponentCompatibility.valueOf(compatibility.trim().toUpperCase()));
+        componentDto.setDescription(description);
+        componentDto.setPrice(price);
+        componentDto.setType(ComponentType.valueOf(type.trim().toUpperCase()));
+        componentDto.setMaterial(ComponentMaterial.valueOf(material.trim().toUpperCase()));
 
         try {
             String response = componentService.registerComponent(componentDto, image);
@@ -81,8 +81,23 @@ public class ComponentController {
     }
 
     @PutMapping("/updateComponent/{id}")
-    public ResponseEntity<?> updateComponent(@PathVariable Long id, @RequestBody ComponentDto componentDto) {
-        String response = componentService.update(id, componentDto);
+    public ResponseEntity<?> updateComponent(@PathVariable Long id,
+                                             @RequestParam("description") String description,
+                                             @RequestParam("price") Double price,
+                                             @RequestParam(value = "category", required = true) String category,
+                                             @RequestParam(value = "compatibility", required = true) String compatibility,
+                                             @RequestParam(value = "type", required = true) String type,
+                                             @RequestParam(value = "material", required = true) String material,
+                                             @RequestParam(value = "image", required = false) MultipartFile image) throws IOException {
+        ComponentDto componentDto = new ComponentDto();
+        componentDto.setDescription(description);
+        componentDto.setPrice(price);
+        componentDto.setCategory(ComponentCategory.valueOf(category.trim().toUpperCase()));
+        componentDto.setCompatibility(ComponentCompatibility.valueOf(compatibility.trim().toUpperCase()));
+        componentDto.setType(ComponentType.valueOf(type.trim().toUpperCase()));
+        componentDto.setMaterial(ComponentMaterial.valueOf(material.trim().toUpperCase()));
+
+        String response = componentService.update(id, componentDto, image);
         if (!"SUCCESS".equals(response)) {
             return ResponseEntity.badRequest().body(response);
         }
@@ -123,19 +138,23 @@ public class ComponentController {
         return ResponseEntity.ok("Component deleted successfully");
     }
 
-    @PutMapping("/updateStockLevel/{id}")
+    @PutMapping("/updateStockLevel/{id}/{stockLevel}")
     public ResponseEntity<?> updateStockLevel(
             @PathVariable Long id,
-            @RequestBody StockLevelDto stockLevelDto) {
-        if (stockLevelDto == null || stockLevelDto.getStock_level() == null
-                || stockLevelDto.getStock_level() < 0) {
+            @PathVariable Integer stockLevel) {
+        if (stockLevel == null || stockLevel < 0) {
             return ResponseEntity.badRequest().body("Stock level must be 0 or greater");
         }
 
-        String response = componentService.updateStockLevel(id, stockLevelDto.getStock_level());
+        String response = componentService.updateStockLevel(id, stockLevel);
         if (!"SUCCESS".equals(response)) {
             return ResponseEntity.status(500).body("Failed to update stock level");
         }
         return ResponseEntity.ok("Stock level updated successfully");
+    }
+
+    @GetMapping("/inventory-report")
+    public ResponseEntity<InventoryReportDto> getInventoryReport() {
+        return ResponseEntity.ok(componentService.buildInventoryReport());
     }
 }

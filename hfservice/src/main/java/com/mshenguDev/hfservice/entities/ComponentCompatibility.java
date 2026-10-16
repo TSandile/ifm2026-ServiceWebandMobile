@@ -1,6 +1,6 @@
 package com.mshenguDev.hfservice.entities;
 
-public enum Compatibility {
+public enum ComponentCompatibility {
     CHAIR,
     TABLE
 }
