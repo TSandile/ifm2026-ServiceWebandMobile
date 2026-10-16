@@ -7,9 +7,10 @@ import com.mshenguDev.hfservice.entities.Component;
 import java.util.List;
 
 public interface CompatibilityPairService {
-    String registerPair(Component componentA, Component componentB);
+    String registerPair(Long componentAId, Long componentBId);
     List<CompatiblePair> getAllPairsByStatus(CompatibilityStatus status);
     List<Component> getAllPairs();
     CompatiblePair getPairById(Long id);
     String deletePair(Long id);
+    String updateStatus(Long id,CompatibilityStatus status);
 }

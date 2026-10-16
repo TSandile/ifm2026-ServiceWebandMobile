@@ -4,21 +4,40 @@ import com.mshenguDev.hfservice.entities.CompatibilityStatus;
 import com.mshenguDev.hfservice.entities.CompatiblePair;
 import com.mshenguDev.hfservice.entities.Component;
 import com.mshenguDev.hfservice.repositories.CompatiblePairRepo;
+import com.mshenguDev.hfservice.repositories.ComponentRepository;
 import com.mshenguDev.hfservice.services.CompatibilityPairService;
 
 import java.util.List;
 
 public class CompatibilityPairServiceImpl implements CompatibilityPairService {
     private final CompatiblePairRepo  compatiblePairRepo;
-    public CompatibilityPairServiceImpl(CompatiblePairRepo compatiblePairRepo) {
+    private final ComponentRepository componentRepository;
+    public CompatibilityPairServiceImpl(CompatiblePairRepo compatiblePairRepo, ComponentRepository componentRepository) {
         this.compatiblePairRepo = compatiblePairRepo;
+        this.componentRepository = componentRepository;
     }
     @Override
-    public String registerPair(Component componentA, Component componentB) {
-        CompatiblePair compatiblePair = new CompatiblePair(componentA, componentB);
+    public String registerPair(Long componentAId, Long componentBId) {
+        if(componentAId == null || componentBId == null) {
+            return "FAIL NO_ID";
+        }
 
-        return "";
+        Component componentA = componentRepository.findById(componentAId).orElse(null);
+        Component componentB = componentRepository.findById(componentBId).orElse(null);
+
+        if(componentA == null || componentB == null) {
+            return "FAIL MISSING_COMPONENT";
+        }
+
+        CompatiblePair compatiblePair = new CompatiblePair();
+        compatiblePair.setComponentA(componentA);
+        compatiblePair.setComponentB(componentB);
+        compatiblePair.setStatus(CompatibilityStatus.COMPATIBLE);
+        compatiblePairRepo.save(compatiblePair);
+        return "SUCCESS";
     }
+
+
 
     @Override
     public List<CompatiblePair> getAllPairsByStatus(CompatibilityStatus status) {
@@ -42,5 +61,16 @@ public class CompatibilityPairServiceImpl implements CompatibilityPairService {
             return "SUCCESS";
         }else{
         return "FAIL";}
+    }
+
+    @Override
+    public String updateStatus(Long id, CompatibilityStatus status) {
+        CompatiblePair existingCompPair = compatiblePairRepo.findById(id).orElse(null);
+        if(existingCompPair != null){
+            existingCompPair.setStatus(status);
+            compatiblePairRepo.save(existingCompPair);
+            return "SUCCESS";
+        }
+        return "FAIL";
     }
 }
